@@ -2,94 +2,149 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>3D Birthday Surprise 🎂</title>
+  <title>2D Birthday Surprise 🎂</title>
   <style>
-    body { margin: 0; overflow: hidden; background: #ffdde1; }
-    canvas { display: block; }
-    #msg {
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+      overflow: hidden;
+      font-family: "Poppins", sans-serif;
+    }
+
+    h1 {
       position: absolute;
-      top: 20px;
+      top: 40px;
+      font-size: 3rem;
+      color: #fff;
+      text-shadow: 0 0 10px #ff4081, 0 0 20px #ff80ab;
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #ff80ab, 0 0 20px #ff4081; }
+      to   { text-shadow: 0 0 20px #ff80ab, 0 0 40px #ff4081; }
+    }
+
+    /* Cake */
+    .cake {
+      position: relative;
+      width: 200px;
+      height: 120px;
+      background: #ffb347;
+      border-radius: 0 0 20px 20px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    }
+    .cake::before {
+      content: "";
+      position: absolute;
+      top: -40px;
+      width: 200px;
+      height: 40px;
+      background: #8b4513;
+      border-radius: 20px 20px 0 0;
+    }
+
+    /* Candles */
+    .candle {
+      position: absolute;
+      width: 10px;
+      height: 40px;
+      background: white;
+      top: -60px;
+      border-radius: 3px;
+    }
+    .candle:nth-child(1) { left: 50px; }
+    .candle:nth-child(2) { left: 95px; }
+    .candle:nth-child(3) { left: 140px; }
+
+    /* Flame */
+    .flame {
+      position: absolute;
+      top: -20px;
+      left: 50%;
+      width: 12px;
+      height: 20px;
+      background: radial-gradient(circle, yellow 40%, orange 70%, transparent 80%);
+      border-radius: 50% 50% 50% 50%;
+      transform: translateX(-50%);
+      animation: flicker 0.3s infinite alternate;
+    }
+    @keyframes flicker {
+      from { transform: translateX(-50%) scale(1); opacity: 1; }
+      to   { transform: translateX(-50%) scale(1.2); opacity: 0.7; }
+    }
+
+    /* Floating balloons */
+    .balloon {
+      position: absolute;
+      width: 40px;
+      height: 50px;
+      border-radius: 50%;
+      background: red;
+      animation: float 6s infinite ease-in-out;
+    }
+    .balloon::after {
+      content: "";
+      position: absolute;
+      width: 2px;
+      height: 40px;
+      background: #555;
+      top: 50px;
       left: 50%;
       transform: translateX(-50%);
-      font-family: "Poppins", sans-serif;
-      font-size: 2rem;
-      color: #ff4081;
-      text-shadow: 0 0 10px white, 0 0 20px pink;
+    }
+    @keyframes float {
+      0% { transform: translateY(100vh) scale(1); opacity: 1; }
+      100% { transform: translateY(-150px) scale(1.2); opacity: 0; }
+    }
+
+    /* Confetti (hearts & stars) */
+    .confetti {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
     }
   </style>
 </head>
 <body>
-  <div id="msg">🎉 Happy Birthday Shruti! 🎂</div>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/geometries/TextGeometry.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/FontLoader.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/libs/helvetiker_regular.typeface.json"></script>
+  <h1>🎉 Happy Birthday Shruti! 🎂</h1>
+  
+  <div class="cake">
+    <div class="candle"><div class="flame"></div></div>
+    <div class="candle"><div class="flame"></div></div>
+    <div class="candle"><div class="flame"></div></div>
+  </div>
 
   <script>
-    // Scene setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({antialias: true});
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
-
-    // Lights
-    const light = new THREE.PointLight(0xffffff, 1, 100);
-    light.position.set(5,5,5);
-    scene.add(light);
-    scene.add(new THREE.AmbientLight(0xffcccc, 0.6));
-
-    // Cake (Cylinder)
-    const cakeGeometry = new THREE.CylinderGeometry(2, 2, 1.5, 32);
-    const cakeMaterial = new THREE.MeshPhongMaterial({color: 0xffa07a});
-    const cake = new THREE.Mesh(cakeGeometry, cakeMaterial);
-    scene.add(cake);
-
-    // Candle
-    const candleGeometry = new THREE.CylinderGeometry(0.1, 0.1, 1, 16);
-    const candleMaterial = new THREE.MeshPhongMaterial({color: 0xffffff});
-    const candle = new THREE.Mesh(candleGeometry, candleMaterial);
-    candle.position.y = 1.5;
-    scene.add(candle);
-
-    // Flame (sphere)
-    const flameGeometry = new THREE.SphereGeometry(0.2, 16, 16);
-    const flameMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
-    const flame = new THREE.Mesh(flameGeometry, flameMaterial);
-    flame.position.y = 2;
-    scene.add(flame);
-
-    // Balloons
-    function createBalloon(color, x, z) {
-      const balloonGeo = new THREE.SphereGeometry(0.6, 16, 16);
-      const balloonMat = new THREE.MeshPhongMaterial({color});
-      const balloon = new THREE.Mesh(balloonGeo, balloonMat);
-      balloon.position.set(x, 3 + Math.random()*2, z);
-      scene.add(balloon);
+    // Generate balloons
+    const colors = ["red","blue","yellow","green","purple","pink"];
+    for (let i=0; i<8; i++) {
+      const b = document.createElement("div");
+      b.className = "balloon";
+      b.style.background = colors[Math.floor(Math.random()*colors.length)];
+      b.style.left = Math.random()*100 + "vw";
+      b.style.animationDuration = (4+Math.random()*4) + "s";
+      document.body.appendChild(b);
     }
-    createBalloon(0xff0000, -3, 0);
-    createBalloon(0x0000ff, 3, 0);
-    createBalloon(0xffff00, 0, -3);
 
-    // Camera
-    camera.position.z = 7;
-
-    // Animation
-    function animate() {
-      requestAnimationFrame(animate);
-      cake.rotation.y += 0.01;
-      candle.rotation.y += 0.02;
-      flame.scale.setScalar(1 + 0.1*Math.sin(Date.now()*0.01)); // flicker
-      renderer.render(scene, camera);
+    // Generate confetti (hearts & stars)
+    const emojis = ["❤️","⭐"];
+    for (let i=0; i<40; i++) {
+      const c = document.createElement("div");
+      c.className = "confetti";
+      c.innerText = emojis[Math.floor(Math.random()*emojis.length)];
+      c.style.left = Math.random()*100 + "vw";
+      c.style.animationDuration = (3+Math.random()*5) + "s";
+      c.style.fontSize = (1+Math.random()*2) + "rem";
+      document.body.appendChild(c);
     }
-    animate();
-
-    // Resize
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
   </script>
 </body>
 </html>
